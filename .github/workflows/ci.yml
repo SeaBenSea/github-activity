@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            extension: ""
+          - os: macos-latest
+            extension: ""
+          - os: windows-latest
+            extension: ".exe"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: cargo fetch
+
+      - name: Build
+        run: cargo build --release --verbose
+
+      - name: Run Tests
+        run: cargo test --verbose
+
+      - name: Run Clippy for Linting
+        if: ${{ github.ref != 'refs/heads/master' }}
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check Code Formatting
+        if: ${{ github.ref != 'refs/heads/master' }}
+        run: cargo fmt --all -- --check
+
+      - name: Upload Executable
+        uses: actions/upload-artifact@v4
+        if: ${{ github.ref == 'refs/heads/master' }}
+        with:
+          name: github-activity-${{ matrix.os }}
+          path: target/release/github-activity${{ matrix.extension }}
+          retention-days: 1
