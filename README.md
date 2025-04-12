@@ -172,3 +172,7 @@ This will fetch events from the local server running at `http://localhost:5000/e
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+## Credits
+
+This project is inspired by the [GitHub User Activity](https://roadmap.sh/projects/github-user-activity) on [roadmap.sh](https://roadmap.sh/).
